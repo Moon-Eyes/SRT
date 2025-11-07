@@ -1,41 +1,41 @@
-iterative=300;            %Éèµü´ú´ÎÊıÎª300´Î°É  
-imagename='cat.jpg';    %ÄãÏëÒªÌáÈ¡ÏàÎ»µÄÍ¼ÏñÃû³Æ  
-phaseimage='phase.png';  %Òª±£´æµÄÏàÎ»Í¼ÏñÃû³Æ  
+iterative=300;            %è®¾è¿­ä»£æ¬¡æ•°ä¸º300æ¬¡å§  
+imagename='Butterfly.png';    %ä½ æƒ³è¦æå–ç›¸ä½çš„å›¾åƒåç§°  
+phaseimage='phase.png';  %è¦ä¿å­˜çš„ç›¸ä½å›¾åƒåç§°  
   
   
-%¿ÕÓòÊäÈëÍ¼ÏñµÄ·ù¶È£¨ÊÇÒÑÖªµÄ£¬Ò²¾ÍÊÇÇåÎúµÄÍ¼Ïñ£¬ËüµÄ»Ò¶È¾ÍÊÇ·ùÖµ£©ºÍÏàÎ»Í¼Ïñ£¨´ı»Ö¸´£©  
-known_abs_spatial=imread(imagename);            %×÷ÎªÊäÈëÍ¼ÏñµÄ·ù¶È£¬ÊÇÒÑÖªµÄ  
-known_abs_spatial =rgb2gray(known_abs_spatial); %×¢ÒâÒªÓÃµ¥Í¨µÀÍ¼Ïñ×öÊµÑé£¬Èç¹ûÄã¶ÁÈ¡µÄÊÇ²ÊÉ«Í¼Ïñ£¬ÄÇ¾Í°ÉÕâĞĞÈ¡Ïû×¢ÊÍ±ä³É»Ò¶ÈÍ¼Ïñ°É  
-known_abs_spatial=im2double(known_abs_spatial); %½«Í¼Ïñ»Ò¶ÈÓ³Éäµ½0¡«1  
+%ç©ºåŸŸè¾“å…¥å›¾åƒçš„å¹…åº¦ï¼ˆæ˜¯å·²çŸ¥çš„ï¼Œä¹Ÿå°±æ˜¯æ¸…æ™°çš„å›¾åƒï¼Œå®ƒçš„ç°åº¦å°±æ˜¯å¹…å€¼ï¼‰å’Œç›¸ä½å›¾åƒï¼ˆå¾…æ¢å¤ï¼‰  
+known_abs_spatial=imread(imagename);            %ä½œä¸ºè¾“å…¥å›¾åƒçš„å¹…åº¦ï¼Œæ˜¯å·²çŸ¥çš„  
+known_abs_spatial =rgb2gray(known_abs_spatial); %æ³¨æ„è¦ç”¨å•é€šé“å›¾åƒåšå®éªŒï¼Œå¦‚æœä½ è¯»å–çš„æ˜¯å½©è‰²å›¾åƒï¼Œé‚£å°±å§è¿™è¡Œå–æ¶ˆæ³¨é‡Šå˜æˆç°åº¦å›¾åƒå§  
+known_abs_spatial=im2double(known_abs_spatial); %å°†å›¾åƒç°åº¦æ˜ å°„åˆ°0ï½1  
   
-unknown_phase=known_abs_spatial;                %PeppersÍ¼Ïñ×÷ÎªÊäÈëÍ¼ÏñµÄÏàÎ»£¬Ò²¼´Îª´ı»Ö¸´µÄÊı¾İ£¬  
-                                                %ÒªÇóËüºÍknown_abs_spatial´óĞ¡Ò»ÖÂ£¬ËùÒÔÕâÀïÖ±½Ó¸³Öµ¾ÍºÃÁË  
-unknown_phase=im2double(unknown_phase);         %½«Í¼Ïñ»Ò¶ÈÓ³Éäµ½0¡«1  
-unknown_phase2=unknown_phase*2*pi;              %ÏàÎ»·¶Î§Ó³Éäµ½0-2*pi  
-unknown_phase2(unknown_phase2>pi)=unknown_phase2(unknown_phase2>pi)-2*pi;%½øÒ»²½Ó³ÉäÖÁ[-pi,+pi]  
+unknown_phase=known_abs_spatial;                %Pepperså›¾åƒä½œä¸ºè¾“å…¥å›¾åƒçš„ç›¸ä½ï¼Œä¹Ÿå³ä¸ºå¾…æ¢å¤çš„æ•°æ®ï¼Œ  
+                                                %è¦æ±‚å®ƒå’Œknown_abs_spatialå¤§å°ä¸€è‡´ï¼Œæ‰€ä»¥è¿™é‡Œç›´æ¥èµ‹å€¼å°±å¥½äº†  
+unknown_phase=im2double(unknown_phase);         %å°†å›¾åƒç°åº¦æ˜ å°„åˆ°0ï½1  
+unknown_phase2=unknown_phase*2*pi;              %ç›¸ä½èŒƒå›´æ˜ å°„åˆ°0-2*pi  
+unknown_phase2(unknown_phase2>pi)=unknown_phase2(unknown_phase2>pi)-2*pi;%è¿›ä¸€æ­¥æ˜ å°„è‡³[-pi,+pi]  
   
-[width,length]=size(known_abs_spatial);         %»ñÈ¡LenaÍ¼ÏñµÄ´óĞ¡  
-input=known_abs_spatial.*exp(i*unknown_phase2); %×îÖÕÊäÈëÍ¼Ïñ:·ù¶È*e^(i*ÏàÎ»½Ç¶È)£¬ËüÊÇ¸´ÊıÍ¼Ïñ  
-known_abs_fourier=abs(fft2(input));             %ÏÈ½«inputÍ¼Ïñ½øĞĞ¸µÁ¢Ò¶±ä»»£¬È»ºóÈ¡Ä££¬¾ÍÊÇ¸µÊÏ±ä»»ºóµÄ·ù¶È  
-%ÒÔÏÂ¿ªÊ¼µü´úÇóÏàÎ»  
-phase_estimate=pi*rand(width,length);           %ÕâÊÇÉú³ÉÁËÒ»¸±´óĞ¡Îª(width*length)µÄÍ¼Ïñ  
-                                                %ËüµÄÏñËØÖµÊÇÔÚ[0,pi]·¶Î§ÄÚËæ»úÉú³ÉµÄ¡£  
+[width,length]=size(known_abs_spatial);         %è·å–Lenaå›¾åƒçš„å¤§å°  
+input=known_abs_spatial.*exp(1i*unknown_phase2); %æœ€ç»ˆè¾“å…¥å›¾åƒ:å¹…åº¦*e^(i*ç›¸ä½è§’åº¦)ï¼Œå®ƒæ˜¯å¤æ•°å›¾åƒ  
+known_abs_fourier=abs(fft2(input));             %å…ˆå°†inputå›¾åƒè¿›è¡Œå‚…ç«‹å¶å˜æ¢ï¼Œç„¶åå–æ¨¡ï¼Œå°±æ˜¯å‚…æ°å˜æ¢åçš„å¹…åº¦  
+%ä»¥ä¸‹å¼€å§‹è¿­ä»£æ±‚ç›¸ä½  
+phase_estimate=pi*rand(width,length);           %è¿™æ˜¯ç”Ÿæˆäº†ä¸€å‰¯å¤§å°ä¸º(width*length)çš„å›¾åƒ  
+                                                %å®ƒçš„åƒç´ å€¼æ˜¯åœ¨[0,pi]èŒƒå›´å†…éšæœºç”Ÿæˆçš„ã€‚  
 imshow(phase_estimate)  
-%ÒÔÏÂ¿ªÊ¼µü´ú  
+%ä»¥ä¸‹å¼€å§‹è¿­ä»£  
 for p=1:iterative  
-    signal_estimate_spatial=known_abs_spatial.*exp(i*phase_estimate);   %Step 1  ¹¹Ôìestimated signal£º»¹ÊÇ·ù¶È*e^(i*ÏàÎ»½Ç¶È)±ä³É¸´ÊıĞÎÊ½  
-    temp1=fft2(signal_estimate_spatial);                                %¸µÁ¢Ò¶±ä»»µ½ÆµÓò  
-    temp_ang=angle(temp1);                                              %ÇóÏàÎ»»¡¶È£¬ËüµÄ·¶Î§ÊÇ[-pi,pi]  
-    signal_estimate_fourier=known_abs_fourier.*exp(i*temp_ang);         %Step 2  Ìæ»»¸µÊÏ±ä»»ºóµÄ·ù¶È£¬²úÉúestimate Fourier transform  
-    temp2=ifft2(signal_estimate_fourier);                               %Step 3  ¶ÔStep 2²úÉúµÄestimate Fourier transform½øĞĞ¸µÁ¢Ò¶·´±ä»»£¬ÓÖ±ä»»µ½¿ÕÓòÁË  
+    signal_estimate_spatial=known_abs_spatial.*exp(1i*phase_estimate);   %Step 1  æ„é€ estimated signalï¼šè¿˜æ˜¯å¹…åº¦*e^(i*ç›¸ä½è§’åº¦)å˜æˆå¤æ•°å½¢å¼  
+    temp1=fft2(signal_estimate_spatial);                                %å‚…ç«‹å¶å˜æ¢åˆ°é¢‘åŸŸ  
+    temp_ang=angle(temp1);                                              %æ±‚ç›¸ä½å¼§åº¦ï¼Œå®ƒçš„èŒƒå›´æ˜¯[-pi,pi]  
+    signal_estimate_fourier=known_abs_fourier.*exp(1i*temp_ang);         %Step 2  æ›¿æ¢å‚…æ°å˜æ¢åçš„å¹…åº¦ï¼Œäº§ç”Ÿestimate Fourier transform  
+    temp2=ifft2(signal_estimate_fourier);                               %Step 3  å¯¹Step 2äº§ç”Ÿçš„estimate Fourier transformè¿›è¡Œå‚…ç«‹å¶åå˜æ¢ï¼Œåˆå˜æ¢åˆ°ç©ºåŸŸäº†  
     phase_estimate=angle(temp2);                                        %Step 4:estimated phase  
 end  
-%ÒÔÉÏÑ­»·¾ÍÊÇÍ¨¹ıËæ±ãÔ¤ÉèÒ»¸öÏàÎ»Í¼Ïñ£¬ÔÚÑ­»·ÖĞ²»¶Ïµ÷Õû±Æ½üÕæÊµµÄÏàÎ»£¬Ö±µ½Âú×ãÌõ¼ş£¨Ò²¾ÍÊÇÎÒÃÇÇóµÄÏàÎ»ºÍÕæÊµÏàÎ»·Ç³£½Ó½üµÄÊ±ºò£©  
-%²»¹ıÕâÀïÎÒÃÇÖ»ĞèÒªÉè¶¨Ò»¸ö±È½Ï´óµÄÑ­»·¾Í¿ÉÒÔÁË£¬»ù±¾ÉÏ¶¼¿ÉÒÔÂú×ãÌõ¼şÁË£¬Õâ¸ö¼¤¹âÔ­Àí¾Í½²¹ıÁË¡£  
+%ä»¥ä¸Šå¾ªç¯å°±æ˜¯é€šè¿‡éšä¾¿é¢„è®¾ä¸€ä¸ªç›¸ä½å›¾åƒï¼Œåœ¨å¾ªç¯ä¸­ä¸æ–­è°ƒæ•´é€¼è¿‘çœŸå®çš„ç›¸ä½ï¼Œç›´åˆ°æ»¡è¶³æ¡ä»¶ï¼ˆä¹Ÿå°±æ˜¯æˆ‘ä»¬æ±‚çš„ç›¸ä½å’ŒçœŸå®ç›¸ä½éå¸¸æ¥è¿‘çš„æ—¶å€™ï¼‰  
+%ä¸è¿‡è¿™é‡Œæˆ‘ä»¬åªéœ€è¦è®¾å®šä¸€ä¸ªæ¯”è¾ƒå¤§çš„å¾ªç¯å°±å¯ä»¥äº†ï¼ŒåŸºæœ¬ä¸Šéƒ½å¯ä»¥æ»¡è¶³æ¡ä»¶äº†ï¼Œè¿™ä¸ªæ¿€å…‰åŸç†å°±è®²è¿‡äº†ã€‚  
   
-phase_estimate(phase_estimate<0)=phase_estimate(phase_estimate<0)+2*pi; %°Ñestimate_phase´Ó[-pi,+pi]£¬Ó³Éäµ½[0,2pi]  
-retrieved=phase_estimate/(2*pi);%ÔÙÓ³Éäµ½[0,1]  
+phase_estimate(phase_estimate<0)=phase_estimate(phase_estimate<0)+2*pi; %æŠŠestimate_phaseä»[-pi,+pi]ï¼Œæ˜ å°„åˆ°[0,2pi]  
+retrieved=phase_estimate/(2*pi);%å†æ˜ å°„åˆ°[0,1]  
   
 figure (1)  
-imshow(retrieved);title('ÏàÎ»Í¼Ïñ')%ÏÔÊ¾ÎÒÃÇÌáÈ¡µ½µÄÏàÎ»Í¼Ïñ  
+imshow(retrieved);title('ç›¸ä½å›¾åƒ')%æ˜¾ç¤ºæˆ‘ä»¬æå–åˆ°çš„ç›¸ä½å›¾åƒ  
 imwrite(retrieved,phaseimage) 
