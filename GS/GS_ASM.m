@@ -1,25 +1,21 @@
 % -----------------------------------------------------------------
 % GS_ASM.m
-% 结合角谱法(ASM)的GS算法，用于计算菲涅尔衍射全息图
-% 物理参数参考 test_diffraction.m
+% 结合角谱法(ASM)的GS算法，计算菲涅尔衍射全息图
 % -----------------------------------------------------------------
 
-clc; 
-clear; 
+clc;   
 close all;
 
 %% --- 1. 定义物理参数 (参考 circle_diffraction.m) ---
 
-lambda = 532e-9; % 波长
-z = 10e-3;       % 衍射距离
-N = 256;         % 仿真区域像素数 (N x N)
+lambda = 532e-9; 
+z = 10e-3;      
+N = 1024;         
 
-% 为了简便，我们直接使用 test_diffraction.m 中的参数
-% (在实际应用中，您需要根据SLM像素大小和衍射采样定理来选择这些值)
 spot_diameter_physical = 0.5e-3; 
 spot_to_image_ratio = 0.5;
-field_size_physical = spot_diameter_physical / spot_to_image_ratio; %
-dx = field_size_physical / N; %
+field_size_physical = spot_diameter_physical / spot_to_image_ratio; 
+dx = field_size_physical / N; 
 
 fprintf('--------- 仿真物理参数 ---------\n');
 fprintf('波长 (lambda):       %.3f nm\n', lambda * 1e9);
@@ -51,7 +47,7 @@ H_inv = conj(H);
 
 iterative = 300;                % 迭代次数
 imagename = 'Butterfly.png';    % 目标图像
-phaseimage = 'phase_hologram_ASM.png'; % 要保存的相位全息图
+phaseimage = 'phase hologram ASM.png'; % 要保存的相位全息图
 
 target_abs_z = imread(imagename);
 target_abs_z = rgb2gray(target_abs_z);
@@ -121,7 +117,6 @@ imwrite(retrieved_phase_hologram, phaseimage)
 
 %% --- 8. (可选) 验证重建效果 ---
 
-% 让我们看看我们计算出的全息图是否真的能重建出蝴蝶
 % 用平面波(振幅=1)照射我们计算出的全息图 (在 z=0)
 final_object_field = 1 .* exp(1i * phase_estimate_spatial);
 

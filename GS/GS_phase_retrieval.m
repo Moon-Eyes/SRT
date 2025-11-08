@@ -11,7 +11,7 @@ close all;
 %% 1. 初始化参数
 iterative = 300;            
 imagename = 'Butterfly.png';    
-phaseimage = 'phase2D.png';   
+phaseimage = 'phase retrieval.png';   
 
 iterations_to_show = [10, 20, 30, 50, 100, 200];
 figure('Name', '迭代中间结果', 'NumberTitle', 'off');
