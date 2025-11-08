@@ -1,41 +1,123 @@
-iterative=300;            %设迭代次数为300次吧  
-imagename='Butterfly.png';    %你想要提取相位的图像名称  
-phaseimage='phase.png';  %要保存的相位图像名称  
-  
-  
-%空域输入图像的幅度（是已知的，也就是清晰的图像，它的灰度就是幅值）和相位图像（待恢复）  
-known_abs_spatial=imread(imagename);            %作为输入图像的幅度，是已知的  
-known_abs_spatial =rgb2gray(known_abs_spatial); %注意要用单通道图像做实验，如果你读取的是彩色图像，那就吧这行取消注释变成灰度图像吧  
-known_abs_spatial=im2double(known_abs_spatial); %将图像灰度映射到0～1  
-  
-unknown_phase=known_abs_spatial;                %Peppers图像作为输入图像的相位，也即为待恢复的数据，  
-                                                %要求它和known_abs_spatial大小一致，所以这里直接赋值就好了  
-unknown_phase=im2double(unknown_phase);         %将图像灰度映射到0～1  
-unknown_phase2=unknown_phase*2*pi;              %相位范围映射到0-2*pi  
-unknown_phase2(unknown_phase2>pi)=unknown_phase2(unknown_phase2>pi)-2*pi;%进一步映射至[-pi,+pi]  
-  
-[width,length]=size(known_abs_spatial);         %获取Lena图像的大小  
-input=known_abs_spatial.*exp(1i*unknown_phase2); %最终输入图像:幅度*e^(i*相位角度)，它是复数图像  
-known_abs_fourier=abs(fft2(input));             %先将input图像进行傅立叶变换，然后取模，就是傅氏变换后的幅度  
-%以下开始迭代求相位  
-phase_estimate=pi*rand(width,length);           %这是生成了一副大小为(width*length)的图像  
-                                                %它的像素值是在[0,pi]范围内随机生成的。  
-imshow(phase_estimate)  
-%以下开始迭代  
-for p=1:iterative  
-    signal_estimate_spatial=known_abs_spatial.*exp(1i*phase_estimate);   %Step 1  构造estimated signal：还是幅度*e^(i*相位角度)变成复数形式  
-    temp1=fft2(signal_estimate_spatial);                                %傅立叶变换到频域  
-    temp_ang=angle(temp1);                                              %求相位弧度，它的范围是[-pi,pi]  
-    signal_estimate_fourier=known_abs_fourier.*exp(1i*temp_ang);         %Step 2  替换傅氏变换后的幅度，产生estimate Fourier transform  
-    temp2=ifft2(signal_estimate_fourier);                               %Step 3  对Step 2产生的estimate Fourier transform进行傅立叶反变换，又变换到空域了  
-    phase_estimate=angle(temp2);                                        %Step 4:estimated phase  
-end  
-%以上循环就是通过随便预设一个相位图像，在循环中不断调整逼近真实的相位，直到满足条件（也就是我们求的相位和真实相位非常接近的时候）  
-%不过这里我们只需要设定一个比较大的循环就可以了，基本上都可以满足条件了，这个激光原理就讲过了。  
-  
-phase_estimate(phase_estimate<0)=phase_estimate(phase_estimate<0)+2*pi; %把estimate_phase从[-pi,+pi]，映射到[0,2pi]  
-retrieved=phase_estimate/(2*pi);%再映射到[0,1]  
-  
-figure (1)  
-imshow(retrieved);title('相位图像')%显示我们提取到的相位图像  
-imwrite(retrieved,phaseimage) 
+% -----------------------------------------------------------------
+% 脚本：GS_phase_retrieval.m
+% 描述：使用 Gerchberg-Saxton 算法进行相位恢复，并包含
+%       中间结果显示、计时和重建验证模块。
+% -----------------------------------------------------------------
+
+clc;           
+clear;        
+close all;  
+
+%% 1. 初始化参数
+iterative = 300;            
+imagename = 'Butterfly.png';    
+phaseimage = 'phase2D.png';   
+
+iterations_to_show = [10, 20, 30, 50, 100, 200];
+figure('Name', '迭代中间结果', 'NumberTitle', 'off');
+plot_index = 1; 
+
+%% 2. 准备输入数据
+
+known_abs_spatial = imread(imagename);            
+known_abs_spatial = rgb2gray(known_abs_spatial); 
+known_abs_spatial = im2double(known_abs_spatial); 
+
+
+[width, length] = size(known_abs_spatial);      
+temp_phase = 2 * pi * rand(width, length) - pi;  
+input = known_abs_spatial .* exp(1i * temp_phase); 
+known_abs_fourier = abs(fft2(input));            
+
+%% 3. GS 迭代算法
+fprintf('开始 GS 算法迭代 (共 %d 次)...\n', iterative);
+
+tic;
+
+phase_estimate = pi * rand(width, length);
+
+for p = 1:iterative
+    
+    signal_estimate_spatial = known_abs_spatial .* exp(1i * phase_estimate);
+    
+    temp1 = fft2(signal_estimate_spatial);
+    temp_ang = angle(temp1);                           
+    signal_estimate_fourier = known_abs_fourier .* exp(1i * temp_ang); 
+        
+    temp2 = ifft2(signal_estimate_fourier);
+
+    phase_estimate = angle(temp2); 
+
+   
+    if ismember(p, iterations_to_show)
+        temp_phase_img = phase_estimate;
+        temp_phase_img(temp_phase_img < 0) = temp_phase_img(temp_phase_img < 0) + 2 * pi;
+        temp_phase_img = temp_phase_img / (2 * pi);
+        
+        subplot(2, 3, plot_index);
+        imshow(temp_phase_img);
+        title(['第 ', num2str(p), ' 次迭代']);
+        drawnow; 
+        plot_index = plot_index + 1;
+    end
+end
+
+
+elapsed_time = toc;
+fprintf('GS 算法迭代完成。总耗时: %.2f 秒。\n', elapsed_time);
+
+%% 4. 保存最终的相位图像
+
+phase_estimate(phase_estimate < 0) = phase_estimate(phase_estimate < 0) + 2 * pi; 
+retrieved = phase_estimate / (2 * pi); 
+
+figure('Name', '最终结果', 'NumberTitle', 'off');
+subplot(1, 2, 1);
+imshow(known_abs_spatial); title('原始输入图像');
+subplot(1, 2, 2);
+imshow(retrieved); title('最终恢复的相位图像');
+imwrite(retrieved, phaseimage);
+fprintf('最终相位图像已保存为: %s\n', phaseimage);
+
+%% 5. --- 重建验证模块 ---
+% -----------------------------------------------------------------
+% 该模块验证我们能否使用“保存的相位图” + “已知的傅里叶幅度”
+% 来重建出“原始空间图像”。
+% -----------------------------------------------------------------
+
+fprintf('\n--- 开始重建验证模块 ---\n');
+
+disp('请在弹出的窗口中选择您刚刚保存的相位图 (e.g., phase.png)');
+[phase_file, phase_path] = uigetfile({'*.png'; '*.bmp'; '*.jpg'}, ...
+                                    '请选择您刚才保存的相位图');
+
+if isequal(phase_file, 0)
+    disp('用户取消了选择。验证模块终止。');
+else
+    fprintf('已选择相位文件: %s\n', fullfile(phase_path, phase_file));
+    
+    retrieved_phase_img = imread(fullfile(phase_path, phase_file));
+    retrieved_phase_img = im2double(retrieved_phase_img); 
+    
+    retrieved_phase_rad = retrieved_phase_img * 2 * pi;
+    
+    disp('... 正在使用 (已知的空间幅度 + 加载的相位) 进行衍射...');
+    
+    
+    signal_spatial = known_abs_spatial .* exp(1i * retrieved_phase_rad);
+
+    signal_fourier = fft2(signal_spatial);
+    signal_fourier_constrained = known_abs_fourier .* exp(1i * angle(signal_fourier));
+
+    reconstructed_spatial = ifft2(signal_fourier_constrained);
+    reconstructed_image = abs(reconstructed_spatial);
+    
+    figure('Name', '重建验证结果', 'NumberTitle', 'off'); 
+    subplot(1, 2, 1);
+    imshow(known_abs_spatial);
+    title('原始输入图像 (幅度)');
+    
+    subplot(1, 2, 2);
+    imshow(reconstructed_image);
+    title('从(相位图+傅里叶幅度)重建的图像');
+end

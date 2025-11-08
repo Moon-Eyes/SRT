@@ -72,17 +72,17 @@ figure;
 subplot(1, 3, 1);
 imshow(object, []);
 title('原始圆形光斑 (空间域)');
-colormap(gca, gray); % 灰度显示
+
 
 subplot(1, 3, 2);
 imshow(Fabs_data_shifted, []);    
 title('频率域强度分布');
-colormap(gca, gray); 
+
 
 subplot(1, 3, 3);
 imshow(abs(R_reconstructed), []); 
 title('HIO 重建结果 (空间域)');
-colormap(gca, gray); 
+ 
 
 %% 计算频率域误差 (利用 ef.m)
 checker = false(image_size, image_size); % 假设没有需要排除的区域
