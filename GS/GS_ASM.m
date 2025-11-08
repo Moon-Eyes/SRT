@@ -45,7 +45,7 @@ H_inv = conj(H);
 
 %% --- 3. 载入“目标”：衍射平面的“已知幅度” ---
 
-iterative = 300;                % 迭代次数
+iterative = 100;                % 迭代次数
 imagename = 'Butterfly.png';    % 目标图像
 phaseimage = 'phase hologram ASM.png'; % 要保存的相位全息图
 
@@ -95,7 +95,7 @@ for p = 1:iterative
     % (振幅被丢弃，将在下一次循环的步骤1中被重置为1)
     phase_estimate_spatial = angle(signal_spatial_new);
     
-    if mod(p, 50) == 0
+    if mod(p, 10) == 0
         fprintf('迭代 %d / %d\n', p, iterative);
     end
 end
@@ -130,6 +130,9 @@ reconstruction_intensity = abs(reconstruction_at_z).^2;
 
 % 归一化并显示
 reconstruction_display = reconstruction_intensity / max(reconstruction_intensity(:));
+
+% 保存模拟的重建图像
+imwrite(reconstruction_display, 'Butterfly rec.png');
 
 subplot(1, 2, 2);
 x_coords_mm = ((-N/2 : N/2-1) * dx) * 1e3; % 物理坐标 (mm)
